@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import User from '../user.entity';
@@ -15,6 +16,14 @@ describe('The UsersService', () => {
           provide: getRepositoryToken(User),
           useValue: {
             findOneBy,
+          },
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: {
+            get: () => 'any value',
+            set: () => jest.fn(),
+            store: () => jest.fn(),
           },
         },
       ],

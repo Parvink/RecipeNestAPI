@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { RecipesController } from './recipes.controller';
 import { HttpModule } from '@nestjs/axios';
@@ -8,6 +8,7 @@ import Recipe from './recipes.entity';
 
 @Module({
   imports: [
+    CacheModule.register(),
     TypeOrmModule.forFeature([Recipe]),
     HttpModule.register({
       timeout: 2000,

@@ -8,13 +8,18 @@ import { UsersService } from '../../users/users.service';
 import { mockedJwtService } from '../../utils/mocks/jwt.service';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import { AuthenticationController } from '../authentication.controller';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 import * as request from 'supertest';
 import { mockedUser } from '../../utils/mocks/user.mock';
 
 describe('The AuthenticationController', () => {
   let app: INestApplication;
   let userData: User;
+  const emptyArr: string[] = [];
   beforeEach(async () => {
     userData = {
       ...mockedUser,
@@ -23,7 +28,6 @@ describe('The AuthenticationController', () => {
       create: jest.fn().mockResolvedValue(userData),
       save: jest.fn().mockReturnValue(Promise.resolve()),
     };
-
     const module = await Test.createTestingModule({
       controllers: [AuthenticationController],
       providers: [
@@ -32,6 +36,16 @@ describe('The AuthenticationController', () => {
         {
           provide: ConfigService,
           useValue: mockedConfigService,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: {
+            get: () => 'any value',
+            set: () => jest.fn(),
+            store: {
+              keys: jest.fn().mockReturnValue(emptyArr),
+            },
+          },
         },
         {
           provide: JwtService,

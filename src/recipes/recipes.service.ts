@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { map } from 'rxjs';
@@ -10,6 +10,8 @@ import { ResponseRecipe } from './dto/response-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import RecipeNotFoundException from './exceptions/recipeNotFound.exception';
 import Recipe from './recipes.entity';
+import { Cache } from 'cache-manager';
+import { GET_RECIPES_CACHE_KEY } from './constants/recipesCacheKey.constant';
 
 @Injectable()
 export class RecipesService {
@@ -18,11 +20,22 @@ export class RecipesService {
     private recipeRepository: Repository<Recipe>,
     private readonly configService: ConfigService,
     private httpService: HttpService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
+  async clearCache() {
+    const keys: string[] = await this.cacheManager.store.keys();
+    keys.forEach((key) => {
+      if (key.startsWith(GET_RECIPES_CACHE_KEY)) {
+        this.cacheManager.del(key);
+      }
+    });
+  }
 
   async createRecipe(recipeDto: CreateRecipeDto) {
     const newRecipe = await this.recipeRepository.create(recipeDto);
     await this.recipeRepository.save(newRecipe);
+    await this.clearCache();
     return newRecipe;
   }
 
@@ -54,8 +67,11 @@ export class RecipesService {
 
   async updateRecipe(id: number, recipe: UpdateRecipeDto): Promise<Recipe> {
     await this.recipeRepository.update(id, recipe);
-    const updatedPost = await this.recipeRepository.findOneBy({ id });
-    if (updatedPost) return updatedPost;
+    const updatedRecipe = await this.recipeRepository.findOneBy({ id });
+    if (updatedRecipe) {
+      await this.clearCache();
+      return updatedRecipe;
+    }
     throw new RecipeNotFoundException(id);
   }
 
@@ -64,5 +80,6 @@ export class RecipesService {
     if (!deleteResponse.affected) {
       throw new RecipeNotFoundException(id);
     }
+    await this.clearCache();
   }
 }

@@ -9,6 +9,7 @@ import { mockedJwtService } from '../../utils/mocks/jwt.service';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import * as bcrypt from 'bcrypt';
 import { mockedUser } from '../../utils/mocks/user.mock';
+import { CACHE_MANAGER } from '@nestjs/common';
 
 jest.mock('bcrypt');
 
@@ -37,6 +38,13 @@ describe('The AuthenticationService', () => {
         {
           provide: ConfigService,
           useValue: mockedConfigService,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: {
+            get: () => 'any value',
+            set: () => jest.fn(),
+          },
         },
         {
           provide: JwtService,

@@ -6,12 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  CacheTTL,
+  CacheKey,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import CreateAuthenticationDto from '../authentication/dto/register.dto';
 import UpdateUserDto from './dto/update-user.dto';
 import ParameterID from '../utils/parameterID';
 import { ApiTags } from '@nestjs/swagger';
+import { GET_USERS_CACHE_KEY } from './constants/usersCacheKey.constant';
+import { HttpCacheInterceptor } from '../utils/httpCache.interceptor';
 
 @Controller('users')
 @ApiTags('users')
@@ -23,6 +28,9 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheKey(GET_USERS_CACHE_KEY)
+  @CacheTTL(120)
   @Get()
   findAll() {
     return this.usersService.getAllUsers();

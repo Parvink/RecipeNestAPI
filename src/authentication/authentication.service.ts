@@ -25,6 +25,7 @@ export class AuthenticationService {
       delete createdUser.password;
       return createdUser;
     } catch (error) {
+      console.log('exception', error);
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new HttpException(
           'User with that email already exists',
