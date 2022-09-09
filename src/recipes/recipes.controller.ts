@@ -11,8 +11,10 @@ import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import ParameterID from '../utils/parameterID';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('recipes')
+@ApiTags('recipes')
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 

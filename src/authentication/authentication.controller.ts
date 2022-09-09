@@ -16,8 +16,10 @@ import RequestWithUser from './interfaces/requestUser.interface';
 import { LocalAuthenticationGuard } from './guards/localAuthentication.guard';
 import JwtAuthenticationGuard from './guards/jwtAuthentication.guard';
 import User from '../users/user.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('authentication')
+@ApiTags('authentication')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
