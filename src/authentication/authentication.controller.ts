@@ -12,9 +12,9 @@ import {
 
 import { AuthenticationService } from './authentication.service';
 import RegisterDto from './dto/register.dto';
-import RequestWithUser from './requestUser.interface';
-import { LocalAuthenticationGuard } from './localAuthentication.guard';
-import JwtAuthenticationGuard from './jwtAuthentication.guard';
+import RequestWithUser from './interfaces/requestUser.interface';
+import { LocalAuthenticationGuard } from './guards/localAuthentication.guard';
+import JwtAuthenticationGuard from './guards/jwtAuthentication.guard';
 import User from '../users/user.entity';
 
 @Controller('authentication')

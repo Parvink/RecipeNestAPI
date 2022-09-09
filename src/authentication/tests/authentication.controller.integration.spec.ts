@@ -1,16 +1,16 @@
-import { AuthenticationService } from './authentication.service';
+import { AuthenticationService } from '../authentication.service';
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import User from '../users/user.entity';
-import { UsersService } from '../users/users.service';
-import { mockedJwtService } from '../utils/mocks/jwt.service';
-import { mockedConfigService } from '../utils/mocks/config.service';
-import { AuthenticationController } from './authentication.controller';
+import User from '../../users/user.entity';
+import { UsersService } from '../../users/users.service';
+import { mockedJwtService } from '../../utils/mocks/jwt.service';
+import { mockedConfigService } from '../../utils/mocks/config.service';
+import { AuthenticationController } from '../authentication.controller';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { mockedUser } from '../utils/mocks/user.mock';
+import { mockedUser } from '../../utils/mocks/user.mock';
 
 describe('The AuthenticationController', () => {
   let app: INestApplication;

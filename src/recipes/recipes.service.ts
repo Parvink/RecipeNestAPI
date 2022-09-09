@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { ResponseRecipe } from './dto/response-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
-import RecipeNotFoundException from './recipeNotFound.exception';
+import RecipeNotFoundException from './exceptions/recipeNotFound.exception';
 import Recipe from './recipes.entity';
 
 @Injectable()

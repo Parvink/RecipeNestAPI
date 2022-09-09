@@ -1,9 +1,8 @@
 {
   "name": "foodiescout-api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
+  "description": "Rest API for a recipe and meal planner app",
+  "author": "Thomas Kauffmann",
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
