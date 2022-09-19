@@ -18,5 +18,6 @@ import Recipe from './recipes.entity';
   ],
   controllers: [RecipesController],
   providers: [RecipesService],
+  exports: [RecipesService],
 })
 export class RecipesModule {}

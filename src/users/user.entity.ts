@@ -1,5 +1,14 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import Recipe from '../recipes/recipes.entity';
 
 @Entity()
 class User {
@@ -15,6 +24,18 @@ class User {
   @Column()
   @Exclude()
   public password: string;
+
+  @CreateDateColumn()
+  createTime: Date;
+
+  @UpdateDateColumn()
+  updateTime: Date;
+
+  @ManyToMany(() => Recipe, {
+    cascade: true,
+  })
+  @JoinTable()
+  savedRecipes: Recipe[];
 }
 
 export default User;

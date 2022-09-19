@@ -6,13 +6,15 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, FindManyOptions, MoreThan, Repository } from 'typeorm';
 import User from './user.entity';
 import { Cache } from 'cache-manager';
 import UpdateUserDto from './dto/update-user.dto';
 import CreateAuthenticationDto from '../authentication/dto/register.dto';
 import UserNotFoundException from './exceptions/userNotFound.exception';
 import { GET_USERS_CACHE_KEY } from './constants/usersCacheKey.constant';
+import { PaginationOutput } from '../utils/paginationOutput';
+import Recipe from '../recipes/recipes.entity';
 
 @Injectable()
 export class UsersService {
@@ -49,19 +51,45 @@ export class UsersService {
     return newUser;
   }
 
-  getAllUsers(): Promise<User[]> {
-    return this.usersRepository.find();
+  async getAllUsers(
+    offset?: number,
+    limit?: number,
+    startId?: number,
+  ): Promise<PaginationOutput> {
+    const where: FindManyOptions<User>['where'] = {};
+    let separateCount = 0;
+    if (startId) {
+      where.id = MoreThan(startId);
+      separateCount = await this.usersRepository.count();
+    }
+
+    const [users, count] = await this.usersRepository.findAndCount({
+      where,
+      order: {
+        id: 'ASC',
+      },
+      skip: offset,
+      take: limit,
+    });
+
+    return {
+      users,
+      count: startId ? separateCount : count,
+    };
   }
 
   async getUserById(id: number): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['savedRecipes'],
+    });
     if (user) return user;
     throw new UserNotFoundException(id);
   }
 
   async updateUser(id: number, user: UpdateUserDto) {
     await this.usersRepository.update(id, user);
-    const updatedUser = await this.usersRepository.findOneBy({ id });
+    const updatedUser: User = await this.usersRepository.findOneBy({ id });
     if (updatedUser) {
       await this.clearCache();
       return updatedUser;
@@ -69,8 +97,26 @@ export class UsersService {
     throw new UserNotFoundException(id);
   }
 
+  async saveRecipe(id: number, recipe: Recipe) {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['savedRecipes'],
+    });
+    if (!user) {
+      throw new UserNotFoundException(id);
+    }
+    if (!user.savedRecipes) {
+      user.savedRecipes = [recipe];
+    } else {
+      user.savedRecipes.push(recipe);
+    }
+    await this.usersRepository.save(user);
+    await this.clearCache();
+    return user;
+  }
+
   async deleteUser(id: number) {
-    const deleteResponse = await this.usersRepository.delete(id);
+    const deleteResponse: DeleteResult = await this.usersRepository.delete(id);
     if (!deleteResponse.affected) {
       throw new UserNotFoundException(id);
     }

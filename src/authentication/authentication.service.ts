@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import TokenPayload from './interfaces/tokenPayload.interface';
+import WrongCredentialsException from './exceptions/wrongCredentials.exception';
+import User from '../users/user.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -25,7 +27,6 @@ export class AuthenticationService {
       delete createdUser.password;
       return createdUser;
     } catch (error) {
-      console.log('exception', error);
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new HttpException(
           'User with that email already exists',
@@ -39,17 +40,17 @@ export class AuthenticationService {
     }
   }
 
-  public async getAuthenticatedUser(email: string, plainTextPassword: string) {
+  public async getAuthenticatedUser(
+    email: string,
+    plainTextPassword: string,
+  ): Promise<User> {
     try {
       const user = await this.usersService.getByEmail(email);
       await this.verifyPassword(plainTextPassword, user.password);
       delete user.password;
       return user;
     } catch (error) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new WrongCredentialsException();
     }
   }
 
@@ -62,14 +63,11 @@ export class AuthenticationService {
       hashedPassword,
     );
     if (!isPasswordMatching) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new WrongCredentialsException();
     }
   }
 
-  public getCookieWithJwtToken(userId: number) {
+  public getCookieWithJwtToken(userId: number): string {
     const payload: TokenPayload = { userId };
     const token = this.jwtService.sign(payload);
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
@@ -77,7 +75,7 @@ export class AuthenticationService {
     )}`;
   }
 
-  public getCookieForLogOut() {
+  public getCookieForLogOut(): string {
     return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 }

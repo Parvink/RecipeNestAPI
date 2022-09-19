@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { TransformRecipeDto } from './dto/transform-recipe.dto';
 
 @Entity()
@@ -32,6 +38,12 @@ class Recipe {
 
   @Column()
   public calories: number;
+
+  @CreateDateColumn()
+  createTime: Date;
+
+  @UpdateDateColumn()
+  updateTime: Date;
 
   @Column()
   public carbon: number;

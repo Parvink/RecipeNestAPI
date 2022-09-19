@@ -1,5 +1,11 @@
 import { HttpService } from '@nestjs/axios';
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { map } from 'rxjs';
@@ -12,6 +18,7 @@ import RecipeNotFoundException from './exceptions/recipeNotFound.exception';
 import Recipe from './recipes.entity';
 import { Cache } from 'cache-manager';
 import { GET_RECIPES_CACHE_KEY } from './constants/recipesCacheKey.constant';
+import PostgresErrorCode from '../database/postgresErrorCodes.enum';
 
 @Injectable()
 export class RecipesService {
@@ -33,10 +40,23 @@ export class RecipesService {
   }
 
   async createRecipe(recipeDto: CreateRecipeDto) {
-    const newRecipe = await this.recipeRepository.create(recipeDto);
-    await this.recipeRepository.save(newRecipe);
-    await this.clearCache();
-    return newRecipe;
+    try {
+      const newRecipe = await this.recipeRepository.create(recipeDto);
+      await this.recipeRepository.save(newRecipe);
+      await this.clearCache();
+      return newRecipe;
+    } catch (error) {
+      if (error?.code === PostgresErrorCode.UniqueViolation) {
+        throw new HttpException(
+          'A recipe with that url already exists',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      throw new HttpException(
+        'Something went wrong',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   fetchRequests() {
@@ -75,7 +95,7 @@ export class RecipesService {
     throw new RecipeNotFoundException(id);
   }
 
-  async deleteRecipe(id: number) {
+  async deleteRecipe(id: number): Promise<void> {
     const deleteResponse = await this.recipeRepository.delete(id);
     if (!deleteResponse.affected) {
       throw new RecipeNotFoundException(id);

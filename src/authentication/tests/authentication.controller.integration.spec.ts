@@ -76,7 +76,14 @@ describe('The AuthenticationController', () => {
             password: 'strongPassword',
           })
           .expect(201)
-          .expect(expectedData);
+          .expect({
+            email: mockedUser.email,
+            name: mockedUser.name,
+            savedRecipes: [],
+            id: 1,
+            createTime: mockedUser.createTime.toISOString(),
+            updateTime: mockedUser.updateTime.toISOString(),
+          });
       });
     });
     describe('and using invalid data', () => {
