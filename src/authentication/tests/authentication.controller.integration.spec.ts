@@ -20,7 +20,6 @@ import { mockedCacheService } from '../../utils/mocks/cache.service';
 describe('The AuthenticationController', () => {
   let app: INestApplication;
   let userData: User;
-  const emptyArr: string[] = [];
   beforeEach(async () => {
     userData = {
       ...mockedUser,

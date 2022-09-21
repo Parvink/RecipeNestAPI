@@ -10,6 +10,7 @@ import { mockedConfigService } from '../../utils/mocks/config.service';
 import * as bcrypt from 'bcrypt';
 import { mockedUser } from '../../utils/mocks/user.mock';
 import { CACHE_MANAGER } from '@nestjs/common';
+import { mockedCacheService } from '../../utils/mocks/cache.service';
 
 jest.mock('bcrypt');
 
@@ -41,10 +42,7 @@ describe('The AuthenticationService', () => {
         },
         {
           provide: CACHE_MANAGER,
-          useValue: {
-            get: () => 'any value',
-            set: () => jest.fn(),
-          },
+          useValue: mockedCacheService,
         },
         {
           provide: JwtService,
@@ -59,7 +57,7 @@ describe('The AuthenticationService', () => {
     authenticationService = await module.get(AuthenticationService);
     usersService = await module.get(UsersService);
   });
-  describe('when² accessing the data of authenticating user', () => {
+  describe('when accessing the data of authenticating user', () => {
     it('should attempt to get a user by email', async () => {
       const getByEmailSpy = jest.spyOn(usersService, 'getByEmail');
       await authenticationService.getAuthenticatedUser(

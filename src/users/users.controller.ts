@@ -11,7 +11,6 @@ import {
   CacheKey,
   ClassSerializerInterceptor,
   Query,
-  Res,
   UseGuards,
   Req,
   Put,
@@ -25,7 +24,6 @@ import { GET_USERS_CACHE_KEY } from './constants/usersCacheKey.constant';
 import { HttpCacheInterceptor } from '../utils/httpCache.interceptor';
 import { PaginationParams } from '../utils/paginationParams';
 import { RecipesService } from '../recipes/recipes.service';
-import Recipe from '../recipes/recipes.entity';
 import RecipeNotFoundException from '../recipes/exceptions/recipeNotFound.exception';
 import JwtAuthenticationGuard from '../authentication/guards/jwtAuthentication.guard';
 import RequestWithUser from '../authentication/interfaces/requestUser.interface';
