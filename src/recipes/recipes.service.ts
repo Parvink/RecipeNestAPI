@@ -30,7 +30,7 @@ export class RecipesService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async clearCache() {
+  async clearCache(): Promise<void> {
     const keys: string[] = await this.cacheManager.store.keys();
     keys.forEach((key) => {
       if (key.startsWith(GET_RECIPES_CACHE_KEY)) {

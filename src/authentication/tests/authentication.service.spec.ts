@@ -8,6 +8,7 @@ import { UsersService } from '../../users/users.service';
 import { mockedConfigService } from '../../utils/mocks/config.service';
 import { mockedJwtService } from '../../utils/mocks/jwt.service';
 import { CACHE_MANAGER } from '@nestjs/common';
+import { mockedCacheService } from '../../utils/mocks/cache.service';
 
 describe('The AuthenticationService', () => {
   let authenticationService: AuthenticationService;
@@ -26,10 +27,7 @@ describe('The AuthenticationService', () => {
         },
         {
           provide: CACHE_MANAGER,
-          useValue: {
-            get: () => 'any value',
-            set: () => jest.fn(),
-          },
+          useValue: mockedCacheService,
         },
         {
           provide: getRepositoryToken(User),

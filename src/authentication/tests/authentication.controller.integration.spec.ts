@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import * as request from 'supertest';
 import { mockedUser } from '../../utils/mocks/user.mock';
+import { mockedCacheService } from '../../utils/mocks/cache.service';
 
 describe('The AuthenticationController', () => {
   let app: INestApplication;
@@ -39,13 +40,7 @@ describe('The AuthenticationController', () => {
         },
         {
           provide: CACHE_MANAGER,
-          useValue: {
-            get: () => 'any value',
-            set: () => jest.fn(),
-            store: {
-              keys: jest.fn().mockReturnValue(emptyArr),
-            },
-          },
+          useValue: mockedCacheService,
         },
         {
           provide: JwtService,

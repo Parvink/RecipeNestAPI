@@ -66,7 +66,7 @@ describe('The AuthenticationService', () => {
         'user@email.com',
         'strongPassword',
       );
-      expect(getByEmailSpy).toBeCalledTimes(1);
+      expect(getByEmailSpy).toHaveBeenCalledTimes(1);
     });
     describe('and the provided password is not valid', () => {
       beforeEach(() => {

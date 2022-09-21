@@ -28,10 +28,9 @@ export class AuthenticationController {
   register(@Body() registrationData: RegisterDto): Promise<User> {
     return this.authenticationService.register(registrationData);
   }
-
   @UseGuards(JwtAuthenticationGuard)
   @Get()
-  authenticate(@Req() request: RequestWithUser) {
+  authenticate(@Req() request: RequestWithUser): User {
     const user = request.user;
     return user;
   }

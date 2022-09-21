@@ -79,7 +79,7 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({
+    const user: User = await this.usersRepository.findOne({
       where: { id },
       relations: ['savedRecipes'],
     });
@@ -87,7 +87,7 @@ export class UsersService {
     throw new UserNotFoundException(id);
   }
 
-  async updateUser(id: number, user: UpdateUserDto) {
+  async updateUser(id: number, user: UpdateUserDto): Promise<User> {
     await this.usersRepository.update(id, user);
     const updatedUser: User = await this.usersRepository.findOneBy({ id });
     if (updatedUser) {
@@ -97,7 +97,7 @@ export class UsersService {
     throw new UserNotFoundException(id);
   }
 
-  async saveRecipe(id: number, recipe: Recipe) {
+  async saveRecipe(id: number, recipe: Recipe): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
       relations: ['savedRecipes'],
