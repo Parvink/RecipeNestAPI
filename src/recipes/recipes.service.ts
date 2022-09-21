@@ -5,12 +5,13 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { map } from 'rxjs';
 import { constructUrl } from '../utils/urlConstructor';
-import { Repository } from 'typeorm';
+import { FindManyOptions, MoreThan, Repository } from 'typeorm';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { ResponseRecipe } from './dto/response-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
@@ -19,6 +20,7 @@ import Recipe from './recipes.entity';
 import { Cache } from 'cache-manager';
 import { GET_RECIPES_CACHE_KEY } from './constants/recipesCacheKey.constant';
 import PostgresErrorCode from '../database/postgresErrorCodes.enum';
+import { PaginationRecipesOutput } from '../utils/paginationRecipesOutput';
 
 @Injectable()
 export class RecipesService {
@@ -52,10 +54,7 @@ export class RecipesService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      throw new HttpException(
-        'Something went wrong',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new InternalServerErrorException();
     }
   }
 
@@ -75,8 +74,30 @@ export class RecipesService {
     );
   }
 
-  getAllRecipes(): Promise<Recipe[]> {
-    return this.recipeRepository.find();
+  async getAllRecipes(
+    offset?: number,
+    limit?: number,
+    startId?: number,
+  ): Promise<PaginationRecipesOutput> {
+    const where: FindManyOptions<Recipe>['where'] = {};
+    let separateCount = 0;
+    if (startId) {
+      where.id = MoreThan(startId);
+      separateCount = await this.recipeRepository.count();
+    }
+    const [recipes, count] = await this.recipeRepository.findAndCount({
+      where,
+      order: {
+        id: 'ASC',
+      },
+      skip: offset,
+      take: limit,
+    });
+
+    return {
+      recipes,
+      count: startId ? separateCount : count,
+    };
   }
 
   async getRecipeById(id: number): Promise<Recipe> {

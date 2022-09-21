@@ -10,6 +10,7 @@ import {
   CacheKey,
   CacheTTL,
   ClassSerializerInterceptor,
+  Query,
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
@@ -19,6 +20,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { HttpCacheInterceptor } from '../utils/httpCache.interceptor';
 import { GET_RECIPES_CACHE_KEY } from './constants/recipesCacheKey.constant';
 import Recipe from './recipes.entity';
+import { PaginationParams } from '../utils/paginationParams';
+import { PaginationRecipesOutput } from '../utils/paginationRecipesOutput';
 
 @Controller('recipes')
 @ApiTags('recipes')
@@ -41,8 +44,11 @@ export class RecipesController {
   @CacheKey(GET_RECIPES_CACHE_KEY)
   @CacheTTL(120)
   @Get()
-  getAllRecipes(): Promise<Recipe[]> {
-    return this.recipesService.getAllRecipes();
+  getAllRecipes(
+    @Query('search') search: string,
+    @Query() { offset, limit, startId }: PaginationParams,
+  ): Promise<PaginationRecipesOutput> {
+    return this.recipesService.getAllRecipes(offset, limit, startId);
   }
 
   @Get(':id')

@@ -13,7 +13,7 @@ import UpdateUserDto from './dto/update-user.dto';
 import CreateAuthenticationDto from '../authentication/dto/register.dto';
 import UserNotFoundException from './exceptions/userNotFound.exception';
 import { GET_USERS_CACHE_KEY } from './constants/usersCacheKey.constant';
-import { PaginationOutput } from '../utils/paginationOutput';
+import { PaginationUsersOutput } from '../utils/paginationUsersOutput';
 import Recipe from '../recipes/recipes.entity';
 
 @Injectable()
@@ -55,7 +55,7 @@ export class UsersService {
     offset?: number,
     limit?: number,
     startId?: number,
-  ): Promise<PaginationOutput> {
+  ): Promise<PaginationUsersOutput> {
     const where: FindManyOptions<User>['where'] = {};
     let separateCount = 0;
     if (startId) {

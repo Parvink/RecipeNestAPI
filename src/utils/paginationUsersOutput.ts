@@ -1,6 +1,6 @@
 import User from '../users/user.entity';
 
-export class PaginationOutput {
+export class PaginationUsersOutput {
   users: User[];
   count: number;
 }
