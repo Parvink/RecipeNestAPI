@@ -1,11 +1,9 @@
 import { CACHE_MANAGER } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { rejects } from 'assert';
 import { DeleteResult } from 'typeorm';
 import CreateAuthenticationDto from '../../authentication/dto/register.dto';
 import { mockedCacheService } from '../../utils/mocks/cache.service';
-import CreateUserDto from '../dto/create-user.dto';
 import UpdateUserDto from '../dto/update-user.dto';
 import UserNotFoundException from '../exceptions/userNotFound.exception';
 import User from '../user.entity';
